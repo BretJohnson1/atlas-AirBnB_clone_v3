@@ -46,8 +46,6 @@ def place_all(city_id):
     # return jsonify([place.to_dict() for place in city.places])
 
 
-
-
 @app_views.route("/places/<place_id>", methods=['GET'],
                  strict_slashes=False)
 def place_by_id(place_id=None):
