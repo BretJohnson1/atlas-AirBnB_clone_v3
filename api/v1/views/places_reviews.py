@@ -72,55 +72,20 @@ def create_review(place_id):
           user - contains user
     Return: empty dictionary in json format
     """
-    place = storage.get(Place, place_id)
-    if not place:
-        abort(404) # Place not found
-    
-    try:
-        json_data = request.get_json()
-    except:
-        abort(400, 'Not a JSON') # Bad request
-
+    json_data = request.get_json()
     if not json_data:
         abort(400, 'Not a JSON') # Bad request
-
-    if "user_id" not in json_data:
+    place = storage.get(Place, place_id)
+    if not place:
+        abort(404) # Bad request
+    if "user_id" not in json_data.keys():
         abort(400, "Missing user_id") # Bad request
     user = storage.get(User, json_data.get("user_id"))
     if not user:
-        abort(404) # User not found
-    if "text" not in json_data:
-        abort(400, "Missing text") # Bad request
+        abort(404) # Bad request
+    if "text" not in json_data.keys():
+        abort(400, "Missing text")
     json_data["place_id"] = place_id
     review = Review(**json_data)
-    review.save()
     review_json = review.to_dict()
-    return jsonify(review_json), 201
-
-
-@app_views.route("/reviews/<review_id>", methods=[PUT],
-                 strict_slashes=False)
-def update_review(review_id):
-    """
-    This method updates a review
-    Args: review - contains one review object, based on its id
-          json_data - the data to update the review with
-    Return: the updated review in json format
-    """
-    review = storage.get(Review, review_id)
-    if not review:
-        abort(404) # Review not found
-    try:
-        json_data = request.get_json()
-    except:
-        abort(400, 'Not a JSON') # Bad request
-
-    if not json_data:
-        abort(400, 'Not a JSON') # Bad request
-
-    for key, value in json_data.items():
-        if key not in ["id", "user_id", "place_id", "created_at", "updated_at"]:
-            setattr(review, key, value)
-    review.save()
-    review_json = review.to_dict()
-    return jsonify(review_json), 200
+    return jsonify(review_json), 201 # OK
